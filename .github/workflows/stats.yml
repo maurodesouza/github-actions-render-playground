@@ -27,10 +27,21 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
 
 
-      - name: push stats.svg to the output branch
-        uses: crazy-max/ghaction-github-pages@v3.1.0
-        with:
-          target_branch: output
-          build_dir: dist
+      - name: Push to output branch
+        run: |
+          git config user.name "github-actions"
+          git config user.email "github-actions@github.com"
+
+          # muda para a branch output (ou cria)
+          git fetch origin output || true
+          git checkout output || git checkout -b output
+
+          # copia só o arquivo gerado
+          mkdir -p trophies
+          cp dist/trophy.svg trophies/trophy.svg
+
+          git add trophies/trophy.svg
+          git commit -m "update trophy" || echo "no changes"
+          git push origin output
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

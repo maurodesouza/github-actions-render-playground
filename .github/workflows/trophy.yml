@@ -19,29 +19,24 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v4
 
+      - name: Switch to output branch
+        run: |
+          git fetch origin output || true
+          git checkout output || git checkout -b output
+
       - name: Generate trophy
         uses: Erik-Donath/github-profile-trophy@feature/generate-svg
         with:
           theme: monokai
           username: maurodesouza
-          output_path: dist/trophy.svg
+          output_path: trophies/trophy.svg
           token: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Push to output branch
+      - name: Commit and push
         run: |
           git config user.name "github-actions"
           git config user.email "github-actions@github.com"
 
-          # muda para a branch output (ou cria)
-          git fetch origin output || true
-          git checkout output || git checkout -b output
-
-          # copia só o arquivo gerado
-          mkdir -p trophies
-          cp dist/trophy.svg trophies/trophy.svg
-
           git add trophies/trophy.svg
           git commit -m "update trophy" || echo "no changes"
           git push origin output
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

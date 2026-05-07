@@ -1,14 +1,12 @@
 name: Generate stats card
 
 on:
-  schedule: # execute every 12 hours
+  schedule:
     - cron: "* */12 * * *"
-
   workflow_dispatch:
-
   push:
     branches:
-    - main
+      - main
 
 jobs:
   generate:
@@ -18,30 +16,27 @@ jobs:
     timeout-minutes: 5
 
     steps:
-      - name: generate stats.svg
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Switch to output branch
+        run: |
+          git fetch origin output || true
+          git checkout output || git checkout -b output
+
+      - name: Generate stats.svg
         uses: readme-tools/github-readme-stats-action@v1
         with:
           card: stats
           options: username=${{ github.repository_owner }}&hide_title=false&hide_rank=false&show_icons=true&include_all_commits=true&count_private=true&disable_animations=false&theme=dracula&locale=en&hide_border=false&custom_title=Testomg
-          path: dist/stats.svg
+          path: stats/stats.svg
           token: ${{ secrets.GITHUB_TOKEN }}
 
-
-      - name: Push to output branch
+      - name: Commit and push
         run: |
           git config user.name "github-actions"
           git config user.email "github-actions@github.com"
 
-          # muda para a branch output (ou cria)
-          git fetch origin output || true
-          git checkout output || git checkout -b output
-
-          # copia só o arquivo gerado
-          mkdir -p trophies
-          cp dist/trophy.svg trophies/trophy.svg
-
-          git add trophies/trophy.svg
-          git commit -m "update trophy" || echo "no changes"
+          git add stats/stats.svg
+          git commit -m "update stats" || echo "no changes"
           git push origin output
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

@@ -1,4 +1,4 @@
-name: Generate stats card
+name: Generate trophy card
 
 on:
   schedule:

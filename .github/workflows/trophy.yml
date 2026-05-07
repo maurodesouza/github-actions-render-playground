@@ -16,27 +16,18 @@ jobs:
     timeout-minutes: 5
 
     steps:
-      - name: Checkout repo
-        uses: actions/checkout@v4
-
-      - name: Switch to output branch
-        run: |
-          git fetch origin output || true
-          git checkout output || git checkout -b output
-
       - name: Generate trophy
         uses: Erik-Donath/github-profile-trophy@feature/generate-svg
         with:
           theme: monokai
           username: maurodesouza
-          file: trophies/trophy.svg
+          file: dist/trophy.svg
           token: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Commit and push
-        run: |
-          git config user.name "github-actions"
-          git config user.email "github-actions@github.com"
-
-          git add trophies/trophy.svg
-          git commit -m "update trophy" || echo "no changes"
-          git push origin output
+      - name: push stats.svg to the output branch
+        uses: crazy-max/ghaction-github-pages@v3.1.0
+        with:
+          target_branch: output-trophy
+          build_dir: dist
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
